@@ -9,6 +9,8 @@ const { TextArea } = Input;
 
 dayjs.extend(relativeTime);
 
+const userName = 'Michael';
+
 const defaultData = [
   {
     id: 1,
@@ -37,9 +39,7 @@ const defaultData = [
 
 export default function App() {
   const [data, setData] = React.useState(defaultData);
-  const [comments, setComments] = React.useState([]);
   const [submitting, setSubmitting] = React.useState(false);
-  const [value, setValue] = React.useState('');
 
   const findNode = (nodes, predicate) => {
     for (const node of nodes) {
@@ -59,13 +59,6 @@ export default function App() {
     }
   };
 
-  const handleCommmentContentChange = (e, item) => {
-    let comment = findNode(data, ({ id }) => id === item.id);
-    comment.content = e.target.value;
-    setData((prev) => [...data]);
-    console.log(e.target.value);
-  };
-
   const handleEditClick = (item) => {
     console.log(item);
     setNodeValue(data, (item) => (item.editing = false));
@@ -74,11 +67,18 @@ export default function App() {
     setData((prev) => [...data]);
   };
 
+  const handleEditCancelClick = (item) => {
+    console.log(item);
+    let comment = findNode(data, ({ id }) => id === item.id);
+    comment.editing = false;
+    setData((prev) => [...data]);
+  };
+
   const AddComment = (item: any) => {
     let comment = findNode(data, ({ id }) => id === 3);
     comment.children.push({
       id: 0,
-      author: 'Bishop',
+      author: userName,
       content: 'test2',
       children: [],
     });
@@ -86,14 +86,26 @@ export default function App() {
     console.log(comment);
 
     setData((prev) => [...data]);
-
     console.log(data);
   };
+
+  const handleSubmit = (item, val) => {
+    console.log('submitting ', val);
+
+    if (!val) return;
+
+    let comment = findNode(data, ({ id }) => id === item.id);
+    comment.content = val;
+    setData((prev) => [...data]);
+    console.log('done');
+  };
+
   interface EditorProps {
     item: any;
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>, item: any) => void;
-    onSubmit: () => void;
+    //onChange: (e: React.ChangeEvent<HTMLTextAreaElement>, item: any) => void;
+    onSubmit: (item: any, newContentValue: string) => void;
     onEditClick: (item: any) => void;
+    onCancelEdit: (item: any) => void;
     submitting: boolean;
     value: string;
     isAuthor: boolean;
@@ -101,12 +113,14 @@ export default function App() {
   const Editor = ({
     item,
     isAuthor,
-    onChange,
     onSubmit,
     submitting,
     onEditClick,
+    onCancelEdit,
     value,
   }: EditorProps) => {
+    const [contentCopy, setContentCopy] = React.useState(value);
+
     return (
       <React.Fragment>
         <Form.Item noStyle>
@@ -114,8 +128,8 @@ export default function App() {
             <TextArea
               placeholder="Autosize height with minimum and maximum number of lines"
               autoSize={false}
-              onChange={(e) => onChange(e, item)}
-              value={value}
+              onChange={(e) => setContentCopy(e.target.value)}
+              value={contentCopy}
               allowClear
               size="small"
             />
@@ -146,15 +160,30 @@ export default function App() {
               Edit
             </Button>
           )}
-          <Button
-            htmlType="submit"
-            loading={!submitting}
-            onClick={onSubmit}
-            type="link"
-            size="small"
-          >
-            Add a comment
-          </Button>
+
+          {isAuthor && item.editing && (
+            <React.Fragment>
+              <Button
+                htmlType="submit"
+                loading={!submitting}
+                onClick={() => onCancelEdit(item)}
+                type="link"
+                size="small"
+              >
+                Cancel
+              </Button>
+
+              <Button
+                htmlType="submit"
+                loading={!submitting}
+                onClick={() => onSubmit(item, contentCopy)}
+                type="link"
+                size="small"
+              >
+                Save Changes
+              </Button>
+            </React.Fragment>
+          )}
         </Form.Item>
       </React.Fragment>
     );
@@ -169,9 +198,9 @@ export default function App() {
           <Editor
             item={item}
             isAuthor={item.author === 'Michael'}
-            onChange={handleCommmentContentChange}
-            onSubmit={() => AddComment()}
+            onSubmit={handleSubmit}
             onEditClick={handleEditClick}
+            onCancelEdit={handleEditCancelClick}
             submitting={true}
             value={item.content}
           />
