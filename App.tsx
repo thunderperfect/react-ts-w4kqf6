@@ -44,6 +44,7 @@ export default function App() {
   const [submitting, setSubmitting] = React.useState(false);
 
   React.useEffect(() => {
+    console.log('useEffect');
     // Clear the interval when the component unmounts
     return () => clearTimeout(timerRef.current);
   }, []);
@@ -67,7 +68,7 @@ export default function App() {
   };
 
   const handleEditClick = (item) => {
-    console.log(item);
+    console.log('handleEditClick ', item);
     setNodeValue(data, (item) => (item.editing = false));
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = true;
@@ -75,7 +76,7 @@ export default function App() {
   };
 
   const handleEditCancelClick = (item) => {
-    console.log(item);
+    console.log('handleEditCancelClick ', item);
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = false;
     setData((prev) => [...data]);

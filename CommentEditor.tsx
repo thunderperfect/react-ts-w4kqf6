@@ -23,10 +23,9 @@ export default function Editor({
   onSubmit,
   submitting,
   onEditClick,
-  onCancelEdit,
-  value,
+  onCancelEdit
 }: EditorProps) {
-  const [contentCopy, setContentCopy] = React.useState(value);
+  const [contentCopy, setContentCopy] = React.useState(item.content);
   console.log('render');
   return (
     <React.Fragment>
@@ -53,7 +52,7 @@ export default function Editor({
               padding: '0px 0px 2px 5px',
             }}
           >
-            {value}
+            {contentCopy}
           </div>
         </React.Fragment>
       )}
