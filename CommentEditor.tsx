@@ -27,35 +27,38 @@ export default function Editor({
   value,
 }: EditorProps) {
   const [contentCopy, setContentCopy] = React.useState(value);
+  console.log('render');
   return (
     <React.Fragment>
-      <Form.Item noStyle>
-        {item.editing && (
+      {item.editing && (
+        <Form.Item
+          help={!contentCopy && 'Please provide a comment'}
+          validateStatus={!contentCopy ? 'error' : 'success'}
+          style={{ marginBottom: 0 }}
+        >
           <TextArea
             placeholder="Autosize height with minimum and maximum number of lines"
             autoSize={false}
             onChange={(e) => setContentCopy(e.target.value)}
             value={contentCopy}
-            allowClear
             size="small"
           />
-        )}
-        {!item.editing && (
-          <React.Fragment>
-            <div
-              style={{
-                border: '1px solid #DCDCDC',
-                padding: '0px 0px 2px 5px',
-              }}
-            >
-              {value}
-            </div>
-          </React.Fragment>
-        )}
-      </Form.Item>
-      <Form.Item noStyle>
+        </Form.Item>
+      )}
+      {!item.editing && (
+        <React.Fragment>
+          <div
+            style={{
+              border: '1px solid #DCDCDC',
+              padding: '0px 0px 2px 5px',
+            }}
+          >
+            {value}
+          </div>
+        </React.Fragment>
+      )}
+      <Form.Item noStyle style={{ border: '1px solid silver' }}>
         <Button
-          htmlType="submit"
           onClick={() => onEditClick(item)}
           type="link"
           size="small"
@@ -67,7 +70,6 @@ export default function Editor({
         {item.editing && (
           <React.Fragment>
             <Button
-              htmlType="submit"
               onClick={() => onCancelEdit(item)}
               type="link"
               size="small"
