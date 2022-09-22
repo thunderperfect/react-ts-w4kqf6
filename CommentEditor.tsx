@@ -16,7 +16,6 @@ interface EditorProps {
   onEditClick: (item: any) => void;
   onCancelEdit: (item: any) => void;
   submitting: boolean;
-  value: string;
 }
 export default function Editor({
   item,
@@ -25,7 +24,6 @@ export default function Editor({
   onEditClick,
   onCancelEdit,
 }: EditorProps) {
-
   const contentCopyRef = React.useRef(item.content);
   const [contentCopy, setContentCopy] = React.useState(contentCopyRef.current);
 
@@ -35,11 +33,19 @@ export default function Editor({
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    onSubmit(item, contentCopy)
+    onSubmit(item, contentCopy);
     contentCopyRef.current = contentCopy;
   };
 
-  console.log('render');
+  const handleOnChange = (e: { target: { value: any; }; }) => {
+    setContentCopy(e.target.value);
+  };
+
+  const handleOnEditClick = (e) => {
+    onEditClick(item);
+  };
+
+  console.log('render', item);
   return (
     <React.Fragment>
       {item.editing && (
@@ -51,7 +57,7 @@ export default function Editor({
           <TextArea
             placeholder="Autosize height with minimum and maximum number of lines"
             autoSize={false}
-            onChange={(e) => setContentCopy(e.target.value)}
+            onChange={handleOnChange}
             value={contentCopy}
             size="small"
           />
@@ -71,7 +77,7 @@ export default function Editor({
       )}
       <Form.Item noStyle style={{ border: '1px solid silver' }}>
         <Button
-          onClick={() => onEditClick(item)}
+          onClick={handleOnEditClick}
           type="link"
           size="small"
           disabled={item.editing}
@@ -82,7 +88,7 @@ export default function Editor({
         {item.editing && (
           <React.Fragment>
             <Button
-              onClick={(e) => handleCancelEdit(e)}
+              onClick={handleCancelEdit}
               type="link"
               size="small"
               disabled={submitting}
@@ -93,7 +99,7 @@ export default function Editor({
             <Button
               htmlType="submit"
               loading={submitting}
-              onClick={(e) => handleSubmit(e)}
+              onClick={handleSubmit}
               type="link"
               size="small"
             >

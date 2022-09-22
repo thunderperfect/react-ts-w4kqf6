@@ -16,7 +16,7 @@ const defaultData = [
   {
     id: 1,
     author: 'Michael',
-    content: 'Parent Nested Comment',
+    content: 'Parent Comment',
     datetime: '2022-09-22 10:56:00',
     children: [
       {
@@ -108,6 +108,7 @@ export default function App() {
       setSubmitting(false);
       let comment = findNode(data, ({ id }) => id === item.id);
       comment.content = val;
+      comment.datetime = dayjs().format();
       setNodeValue(data, (item) => (item.editing = false));
 
       setData((prev) => [...data]);
@@ -123,12 +124,12 @@ export default function App() {
         content={
           item.author === userName ? (
             <Editor
+              key={item.id}
               item={item}
               onSubmit={handleSubmit}
               onEditClick={handleEditClick}
               onCancelEdit={handleEditCancelClick}
               submitting={submitting}
-              value={item.content}
             />
           ) : (
             <text>{item.content}</text>
