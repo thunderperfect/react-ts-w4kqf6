@@ -23,9 +23,22 @@ export default function Editor({
   onSubmit,
   submitting,
   onEditClick,
-  onCancelEdit
+  onCancelEdit,
 }: EditorProps) {
-  const [contentCopy, setContentCopy] = React.useState(item.content);
+
+  const contentCopyRef = React.useRef(item.content);
+  const [contentCopy, setContentCopy] = React.useState(contentCopyRef.current);
+
+  const handleCancelEdit = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    onCancelEdit(item);
+    setContentCopy(contentCopyRef.current);
+  };
+
+  const handleSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    onSubmit(item, contentCopy)
+    contentCopyRef.current = contentCopy;
+  };
+
   console.log('render');
   return (
     <React.Fragment>
@@ -69,7 +82,7 @@ export default function Editor({
         {item.editing && (
           <React.Fragment>
             <Button
-              onClick={() => onCancelEdit(item)}
+              onClick={(e) => handleCancelEdit(e)}
               type="link"
               size="small"
               disabled={submitting}
@@ -80,7 +93,7 @@ export default function Editor({
             <Button
               htmlType="submit"
               loading={submitting}
-              onClick={() => onSubmit(item, contentCopy)}
+              onClick={(e) => handleSubmit(e)}
               type="link"
               size="small"
             >
