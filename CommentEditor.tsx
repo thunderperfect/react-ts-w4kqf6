@@ -17,11 +17,9 @@ interface EditorProps {
   onCancelEdit: (item: any) => void;
   submitting: boolean;
   value: string;
-  isAuthor: boolean;
 }
 export default function Editor({
   item,
-  isAuthor,
   onSubmit,
   submitting,
   onEditClick,
@@ -32,7 +30,7 @@ export default function Editor({
   return (
     <React.Fragment>
       <Form.Item noStyle>
-        {isAuthor && item.editing && (
+        {item.editing && (
           <TextArea
             placeholder="Autosize height with minimum and maximum number of lines"
             autoSize={false}
@@ -42,7 +40,7 @@ export default function Editor({
             size="small"
           />
         )}
-        {(!isAuthor || !item.editing) && (
+        {!item.editing && (
           <React.Fragment>
             <div
               style={{
@@ -56,34 +54,31 @@ export default function Editor({
         )}
       </Form.Item>
       <Form.Item noStyle>
-        {isAuthor && (
-          <Button
-            htmlType="submit"
-            loading={!submitting}
-            onClick={() => onEditClick(item)}
-            type="link"
-            size="small"
-            disabled={!isAuthor || item.editing}
-          >
-            Edit
-          </Button>
-        )}
+        <Button
+          htmlType="submit"
+          onClick={() => onEditClick(item)}
+          type="link"
+          size="small"
+          disabled={item.editing}
+        >
+          Edit
+        </Button>
 
-        {isAuthor && item.editing && (
+        {item.editing && (
           <React.Fragment>
             <Button
               htmlType="submit"
-              loading={!submitting}
               onClick={() => onCancelEdit(item)}
               type="link"
               size="small"
+              disabled={submitting}
             >
               Cancel
             </Button>
 
             <Button
               htmlType="submit"
-              loading={!submitting}
+              loading={submitting}
               onClick={() => onSubmit(item, contentCopy)}
               type="link"
               size="small"

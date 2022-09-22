@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import Editor from './CommentEditor';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, List, Avatar, Comment, Tooltip } from 'antd';
+import { Input, Avatar, Comment, Tooltip } from 'antd';
 
 const { TextArea } = Input;
 
@@ -39,8 +39,14 @@ const defaultData = [
 ];
 
 export default function App() {
+  const timerRef = React.useRef(null);
   const [data, setData] = React.useState(defaultData);
   const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    // Clear the interval when the component unmounts
+    return () => clearTimeout(timerRef.current);
+  }, []);
 
   const findNode = (nodes, predicate) => {
     for (const node of nodes) {
@@ -95,10 +101,17 @@ export default function App() {
 
     if (!val) return;
 
-    let comment = findNode(data, ({ id }) => id === item.id);
-    comment.content = val;
-    setData((prev) => [...data]);
-    console.log('done');
+    setSubmitting(true);
+
+    timerRef.current = setTimeout(() => {
+      setSubmitting(false);
+      let comment = findNode(data, ({ id }) => id === item.id);
+      comment.content = val;
+      setNodeValue(data, (item) => (item.editing = false));
+
+      setData((prev) => [...data]);
+      console.log('done');
+    }, 1000);
   };
 
   const GetComments = (item: any) => {
@@ -107,15 +120,18 @@ export default function App() {
       <Comment
         avatar={<Avatar size="small" icon={<UserOutlined />} />}
         content={
-          <Editor
-            item={item}
-            isAuthor={item.author === 'Michael'}
-            onSubmit={handleSubmit}
-            onEditClick={handleEditClick}
-            onCancelEdit={handleEditCancelClick}
-            submitting={true}
-            value={item.content}
-          />
+          item.author === userName ? (
+            <Editor
+              item={item}
+              onSubmit={handleSubmit}
+              onEditClick={handleEditClick}
+              onCancelEdit={handleEditCancelClick}
+              submitting={submitting}
+              value={item.content}
+            />
+          ) : (
+            <text>{item.content}</text>
+          )
         }
         author={item.author}
         children={(item.children || []).map((child: any) => GetComments(child))}
