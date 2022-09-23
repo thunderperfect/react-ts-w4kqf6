@@ -120,11 +120,11 @@ export default function App() {
     if (!item) return <React.Fragment />;
     return (
       <Comment
+        key={item.id}
         avatar={<Avatar size="small" icon={<UserOutlined />} />}
         content={
           item.author === userName ? (
             <Editor
-              key={item.id}
               item={item}
               onSubmit={handleSubmit}
               onEditClick={handleEditClick}
@@ -132,7 +132,7 @@ export default function App() {
               submitting={submitting}
             />
           ) : (
-            <text>{item.content}</text>
+            <span>{item.content}</span>
           )
         }
         author={item.author}
