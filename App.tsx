@@ -25,7 +25,7 @@ const defaultData = [
         id: 2,
         parentId: 1,
         level: 1,
-        author: 'Michael',
+        author: 'Angela',
         content: 'single nested comment',
         datetime: '2022-09-22 11:56:00',
       },
@@ -39,7 +39,7 @@ const defaultData = [
       },
     ],
   },
-  { id: 4, parentId: null, author: 'Michael', content: 'test2', children: [] },
+  { id: 4, parentId: null, author: 'Bishop', content: 'test2', children: [] },
 ];
 
 export default function App() {

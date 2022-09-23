@@ -2,8 +2,8 @@ import * as React from 'react';
 import './style.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Button, Form, Input } from 'antd';
-
+import { Button, Form, Input, Popconfirm } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 
 dayjs.extend(relativeTime);
@@ -109,15 +109,6 @@ export default function Editor({
           >
             Edit
           </Button>
-          <ButtonSpacer />
-              <Button       
-                loading={deleting}
-                onClick={handleDeleteClick}
-                type="link"
-                size="small"
-              >
-                Delete
-              </Button>
 
           {item.editing && (
             <React.Fragment>
@@ -142,6 +133,17 @@ export default function Editor({
               </Button>
             </React.Fragment>
           )}
+
+          <ButtonSpacer />
+          <Popconfirm
+            onConfirm={handleDeleteClick}
+            title="Are you sure？"
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          >
+            <Button loading={deleting} type="link" size="small">
+              Delete
+            </Button>
+          </Popconfirm>
         </Form.Item>
       )}
     </React.Fragment>
