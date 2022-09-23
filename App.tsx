@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import Editor from './CommentEditor';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { UserOutlined } from '@ant-design/icons';
-import { Input, Avatar, Comment, Tooltip } from 'antd';
+import { Input, Avatar, Comment, Tooltip, Button } from 'antd';
 
 const { TextArea } = Input;
 
@@ -119,30 +119,35 @@ export default function App() {
   const GetComments = (item: any) => {
     if (!item) return <React.Fragment />;
     return (
-      <Comment
-        key={item.id}
-        avatar={<Avatar size="small" icon={<UserOutlined />} />}
-        content={
-          item.author === userName ? (
-            <Editor
-              item={item}
-              onSubmit={handleSubmit}
-              onEditClick={handleEditClick}
-              onCancelEdit={handleEditCancelClick}
-              submitting={submitting}
-            />
-          ) : (
-            <span>{item.content}</span>
-          )
-        }
-        author={item.author}
-        children={(item.children || []).map((child: any) => GetComments(child))}
-        datetime={
-          <Tooltip title={item.datetime}>
-            <span>{dayjs().to(dayjs(item.datetime))}</span>
-          </Tooltip>
-        }
-      />
+      <React.Fragment>
+        <Comment
+          key={item.id}
+          avatar={<Avatar size="small" icon={<UserOutlined />} />}
+          content={
+            item.author === userName ? (
+              <Editor
+                item={item}
+                onSubmit={handleSubmit}
+                onEditClick={handleEditClick}
+                onCancelEdit={handleEditCancelClick}
+                submitting={submitting}
+              />
+            ) : (
+              <span>{item.content}</span>
+            )
+          }
+          author={item.author}
+          children={(item.children || []).map((child: any) =>
+            GetComments(child)
+          )}
+          datetime={
+            <Tooltip title={item.datetime}>
+              <span>{dayjs().to(dayjs(item.datetime))}</span>
+            </Tooltip>
+          }
+        />
+        <Button>Add Coment</Button>
+      </React.Fragment>
     );
   };
 
