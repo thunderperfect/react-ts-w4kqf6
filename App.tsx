@@ -15,33 +15,38 @@ const userName = 'Michael';
 const defaultData = [
   {
     id: 1,
+    parentId: null,
+    level: 0,
     author: 'Michael',
     content: 'Parent Comment',
     datetime: '2022-09-22 10:56:00',
     children: [
       {
         id: 2,
+        parentId: 1,
+        level: 1,
         author: 'Michael',
         content: 'single nested comment',
         datetime: '2022-09-22 11:56:00',
-        children: [
-          {
-            id: 3,
-            author: 'Angela',
-            content: 'doubled nested comment',
-            children: [],
-          },
-        ],
+      },
+      {
+        id: 3,
+        parentId: 1,
+        level: 1,
+        author: 'Michael',
+        content: 'second nested comment',
+        datetime: '2022-09-22 11:56:00',
       },
     ],
   },
-  { id: 4, author: 'Michael', content: 'test2', children: [] },
+  { id: 4, parentId: null, author: 'Michael', content: 'test2', children: [] },
 ];
 
 export default function App() {
   const timerRef = React.useRef(null);
   const [data, setData] = React.useState(defaultData);
   const [submitting, setSubmitting] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   React.useEffect(() => {
     console.log('useEffect');
@@ -67,6 +72,36 @@ export default function App() {
     }
   };
 
+  const removeComment = (commentId, parentId) => {
+    if (!parentId) {
+      setData(data.filter((item) => item.id !== commentId));
+      return;
+    }
+
+    const newState = data.map((item) => {
+      if (item.id == parentId) {
+        console.log('parent', item.id);
+        item.children = item.children.filter((child) => {
+          return child.id !== commentId;
+        });
+      }
+      return item;
+    });
+
+    setData(newState); // or setState(newState) if you are functional
+
+    // setData((prev) => {
+    //   const parentIndx = data.findIndex((parent) => parent.id == parentId);
+    //   console.log('parentIndx ', parentIndx);
+    //   const items = data[parentIndx].children.filter(
+    //     (child) => child.id !== commentId
+    //   );
+    //   const newState = prev;
+    //   newState[parentIndx].children = items;
+    //   return { ...newState };
+    // });
+  };
+
   const handleEditClick = (item) => {
     console.log('handleEditClick ', item);
     setNodeValue(data, (item) => (item.editing = false));
@@ -80,6 +115,23 @@ export default function App() {
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = false;
     setData((prev) => [...data]);
+  };
+
+  const handleDeleteClick = (item) => {
+    console.log('delehandleDeleteClickting ', item);
+    setDeleting(true);
+
+    timerRef.current = setTimeout(() => {
+      setDeleting(false);
+      //let comment = findNode(data, ({ id }) => id === item.id);
+      //delete comment;
+      setNodeValue(data, (item) => (item.deleting = false));
+
+      removeComment(item.id, item.parentId);
+
+      // setData((prev) => [...data]);
+      console.log('done');
+    }, 1000);
   };
 
   const AddComment = (item: any) => {
@@ -124,17 +176,16 @@ export default function App() {
           key={item.id}
           avatar={<Avatar size="small" icon={<UserOutlined />} />}
           content={
-            item.author === userName ? (
-              <Editor
-                item={item}
-                onSubmit={handleSubmit}
-                onEditClick={handleEditClick}
-                onCancelEdit={handleEditCancelClick}
-                submitting={submitting}
-              />
-            ) : (
-              <span>{item.content}</span>
-            )
+            <Editor
+              item={item}
+              isAuthor={item.author === userName}
+              onSubmit={handleSubmit}
+              onDelete={handleDeleteClick}
+              onEditClick={handleEditClick}
+              onCancelEdit={handleEditCancelClick}
+              submitting={submitting}
+              deleting={deleting}
+            />
           }
           author={item.author}
           children={(item.children || []).map((child: any) =>
@@ -146,7 +197,6 @@ export default function App() {
             </Tooltip>
           }
         />
-        <Button>Add Coment</Button>
       </React.Fragment>
     );
   };
