@@ -16,6 +16,7 @@ interface EditorProps {
   onSubmit: (item: any, newContentValue: string) => void;
   onEditClick: (item: any) => void;
   onCancelEdit: (item: any) => void;
+  onReplying: (item: any) => void;
   submitting: boolean;
   deleting: boolean;
   onDelete: (item: any) => void;
@@ -32,6 +33,7 @@ export default function Editor({
 }: EditorProps) {
   const contentCopyRef = React.useRef(item.content);
   const [contentCopy, setContentCopy] = React.useState(contentCopyRef.current);
+  const showReply = !item.parentId;
 
   const handleCancelEdit = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     onCancelEdit(item);
@@ -87,21 +89,24 @@ export default function Editor({
           </div>
         </React.Fragment>
       )}
-
-      <Button
-        style={{ paddingLeft: 0 }}
-        onClick={handleOnEditClick}
-        type="link"
-        size="small"
-        disabled={item.editing}
-      >
-        Reply
-      </Button>
-
+      {showReply && (
+        <React.Fragment>
+          <Button
+            style={{ paddingLeft: 0 }}
+            onClick={handleOnEditClick}
+            type="link"
+            size="small"
+            disabled={item.editing}
+          >
+            Reply
+          </Button>
+        </React.Fragment>
+      )}
+      {showReply && isAuthor && <ButtonSpacer />}
       {isAuthor && (
         <Form.Item noStyle style={{ border: '1px solid silver' }}>
-          <ButtonSpacer />
           <Button
+            style={!showReply ? { paddingLeft: 0 } : { paddingLeft: 'auto' }}
             onClick={handleOnEditClick}
             type="link"
             size="small"
@@ -133,11 +138,10 @@ export default function Editor({
               </Button>
             </React.Fragment>
           )}
-
           <ButtonSpacer />
           <Popconfirm
             onConfirm={handleDeleteClick}
-            title="Are you sure？"
+            title="Are you sure you want to delete this Comment?"
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
             <Button loading={deleting} type="link" size="small">
