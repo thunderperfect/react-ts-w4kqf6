@@ -14,11 +14,10 @@ interface EditorProps {
   isAuthor: boolean;
   //onChange: (e: React.ChangeEvent<HTMLTextAreaElement>, item: any) => void;
   onSubmit: (item: any, newContentValue: string) => void;
-  onEditClick: (item: any) => void;
+  onEdit: (item: any) => void;
   onCancelEdit: (item: any) => void;
-  onReplying: (item: any) => void;
+  onReply: (item: any) => void;
   submitting: boolean;
-  deleting: boolean;
   onDelete: (item: any) => void;
 }
 export default function Editor({
@@ -26,10 +25,10 @@ export default function Editor({
   isAuthor,
   onSubmit,
   onDelete,
-  submitting,
-  deleting,
-  onEditClick,
+  onEdit,
+  onReply,
   onCancelEdit,
+  submitting,
 }: EditorProps) {
   const contentCopyRef = React.useRef(item.content);
   const [contentCopy, setContentCopy] = React.useState(contentCopyRef.current);
@@ -50,11 +49,15 @@ export default function Editor({
   };
 
   const handleOnEditClick = (e) => {
-    onEditClick(item);
+    onEdit(item);
   };
 
   const handleDeleteClick = (e) => {
     onDelete(item);
+  };
+
+  const handleReplyClick = (e) => {
+    onReply(item);
   };
 
   const ButtonSpacer = () => <span style={{ color: 'silver' }}> | </span>;
@@ -93,10 +96,10 @@ export default function Editor({
         <React.Fragment>
           <Button
             style={{ paddingLeft: 0 }}
-            onClick={handleOnEditClick}
+            onClick={handleReplyClick}
             type="link"
             size="small"
-            disabled={item.editing}
+            disabled={item.replying}
           >
             Reply
           </Button>
@@ -144,7 +147,7 @@ export default function Editor({
             title="Are you sure you want to delete this Comment?"
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
-            <Button loading={deleting} type="link" size="small">
+            <Button loading={item.deleting} type="link" size="small">
               Delete
             </Button>
           </Popconfirm>

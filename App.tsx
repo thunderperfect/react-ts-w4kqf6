@@ -46,7 +46,6 @@ export default function App() {
   const timerRef = React.useRef(null);
   const [data, setData] = React.useState(defaultData);
   const [submitting, setSubmitting] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
 
   React.useEffect(() => {
     console.log('useEffect');
@@ -88,18 +87,7 @@ export default function App() {
       return item;
     });
 
-    setData(newState); // or setState(newState) if you are functional
-
-    // setData((prev) => {
-    //   const parentIndx = data.findIndex((parent) => parent.id == parentId);
-    //   console.log('parentIndx ', parentIndx);
-    //   const items = data[parentIndx].children.filter(
-    //     (child) => child.id !== commentId
-    //   );
-    //   const newState = prev;
-    //   newState[parentIndx].children = items;
-    //   return { ...newState };
-    // });
+    setData(newState);
   };
 
   const handleEditClick = (item) => {
@@ -110,6 +98,15 @@ export default function App() {
     setData((prev) => [...data]);
   };
 
+  const handleReplyClick = (item) => {
+    console.log('handleReplyClick ', item);
+    setNodeValue(data, (item) => (item.replying = false));
+    let comment = findNode(data, ({ id }) => id === item.id);
+    comment.replying = true;
+    setData((prev) => [...data]);
+    AddComment(item);
+  };
+
   const handleEditCancelClick = (item) => {
     console.log('handleEditCancelClick ', item);
     let comment = findNode(data, ({ id }) => id === item.id);
@@ -118,13 +115,9 @@ export default function App() {
   };
 
   const handleDeleteClick = (item) => {
-    console.log('delehandleDeleteClickting ', item);
-    setDeleting(true);
-
+    console.log('handleDeleteClick ', item);
+    setNodeValue(data, (item) => (item.deleting = true));
     timerRef.current = setTimeout(() => {
-      setDeleting(false);
-      //let comment = findNode(data, ({ id }) => id === item.id);
-      //delete comment;
       setNodeValue(data, (item) => (item.deleting = false));
 
       removeComment(item.id, item.parentId);
@@ -135,11 +128,11 @@ export default function App() {
   };
 
   const AddComment = (item: any) => {
-    let comment = findNode(data, ({ id }) => id === 3);
+    let comment = findNode(data, ({ id }) => id === item.id);
     comment.children.push({
-      id: 0,
+      id: 15,
       author: userName,
-      content: 'test2',
+      content: 'newly added Comment',
       children: [],
     });
 
@@ -181,10 +174,10 @@ export default function App() {
               isAuthor={item.author === userName}
               onSubmit={handleSubmit}
               onDelete={handleDeleteClick}
-              onEditClick={handleEditClick}
+              onEdit={handleEditClick}
               onCancelEdit={handleEditCancelClick}
               submitting={submitting}
-              deleting={deleting}
+              onReply={handleReplyClick}
             />
           }
           author={item.author}
