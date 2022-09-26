@@ -4,20 +4,20 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Button, Form, Input, Popconfirm } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { ICommentItem } from './ICommentItem';
+import { CommentItem } from './CommentItem';
 const { TextArea } = Input;
 
 dayjs.extend(relativeTime);
 
 const userName = 'Michael';
 interface EditorProps {
-  item: ICommentItem;
+  item: CommentItem;
   isAuthor: boolean;
-  onSubmit: (item: ICommentItem, newContentValue: string) => void;
-  onEdit: (item: ICommentItem) => void;
-  onCancelEdit: (item: ICommentItem) => void;
-  onReply: (item: ICommentItem) => void;
-  onDelete: (item: ICommentItem) => void;
+  onSubmit: (item: CommentItem, newContentValue: string) => void;
+  onEdit: (item: CommentItem) => void;
+  onCancelEdit: (item: CommentItem) => void;
+  onReply: (item: CommentItem) => void;
+  onDelete: (item: CommentItem) => void;
 }
 export default function Editor({
   item,
@@ -123,7 +123,7 @@ export default function Editor({
             <React.Fragment>
               <ButtonSpacer />
               <Button
-                onClick={handleCancelEdit}
+                onClick={item.replying ? handleDeleteClick : handleCancelEdit}
                 type="link"
                 size="small"
                 disabled={item.submitting}
