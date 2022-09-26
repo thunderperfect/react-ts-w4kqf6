@@ -134,6 +134,7 @@ export default function App() {
       author: userName,
       content: 'newly added Comment',
       children: [],
+      parentId: item.id,
     });
 
     console.log(comment);
