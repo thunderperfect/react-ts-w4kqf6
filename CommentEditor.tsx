@@ -84,10 +84,12 @@ export default function Editor({
       {!item.editing && (
         <React.Fragment>
           <div
-            style={{
-              //border: '1px solid #DCDCDC',
-              //padding: '0px 0px 2px 5px',
-            }}
+            style={
+              {
+                //border: '1px solid #DCDCDC',
+                //padding: '0px 0px 2px 5px',
+              }
+            }
           >
             {contentCopy}
           </div>
@@ -144,6 +146,7 @@ export default function Editor({
           )}
           <ButtonSpacer />
           <Popconfirm
+            disabled={item.editing}
             onConfirm={handleDeleteClick}
             title={
               item.children
@@ -152,7 +155,12 @@ export default function Editor({
             }
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
-            <Button loading={item.deleting} type="link" size="small">
+            <Button
+              loading={item.deleting}
+              disabled={item.editing}
+              type="link"
+              size="small"
+            >
               Delete
             </Button>
           </Popconfirm>
