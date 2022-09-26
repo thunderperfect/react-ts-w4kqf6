@@ -4,21 +4,20 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Button, Form, Input, Popconfirm } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import { ICommentItem } from './ICommentItem';
 const { TextArea } = Input;
 
 dayjs.extend(relativeTime);
 
 const userName = 'Michael';
 interface EditorProps {
-  item: any;
+  item: ICommentItem;
   isAuthor: boolean;
-  //onChange: (e: React.ChangeEvent<HTMLTextAreaElement>, item: any) => void;
-  onSubmit: (item: any, newContentValue: string) => void;
-  onEdit: (item: any) => void;
-  onCancelEdit: (item: any) => void;
-  onReply: (item: any) => void;
-  submitting: boolean;
-  onDelete: (item: any) => void;
+  onSubmit: (item: ICommentItem, newContentValue: string) => void;
+  onEdit: (item: ICommentItem) => void;
+  onCancelEdit: (item: ICommentItem) => void;
+  onReply: (item: ICommentItem) => void;
+  onDelete: (item: ICommentItem) => void;
 }
 export default function Editor({
   item,
@@ -28,7 +27,6 @@ export default function Editor({
   onEdit,
   onReply,
   onCancelEdit,
-  submitting,
 }: EditorProps) {
   const contentCopyRef = React.useRef(item.content);
   const [contentCopy, setContentCopy] = React.useState(contentCopyRef.current);
@@ -48,11 +46,11 @@ export default function Editor({
     setContentCopy(e.target.value);
   };
 
-  const handleOnEditClick = (e) => {
+  const handleOnEditClick = () => {
     onEdit(item);
   };
 
-  const handleDeleteClick = (e) => {
+  const handleDeleteClick = () => {
     onDelete(item);
   };
 
@@ -102,9 +100,9 @@ export default function Editor({
             onClick={handleReplyClick}
             type="link"
             size="small"
-            disabled={item.replying || item.editing}
+            disabled={item.editing}
           >
-            Add a comment
+            Reply
           </Button>
         </React.Fragment>
       )}
@@ -128,14 +126,14 @@ export default function Editor({
                 onClick={handleCancelEdit}
                 type="link"
                 size="small"
-                disabled={submitting}
+                disabled={item.submitting}
               >
                 Cancel
               </Button>
               <ButtonSpacer />
               <Button
                 htmlType="submit"
-                loading={submitting}
+                loading={item.submitting}
                 onClick={handleSubmit}
                 type="link"
                 size="small"

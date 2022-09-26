@@ -5,41 +5,48 @@ import Editor from './CommentEditor';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { UserOutlined } from '@ant-design/icons';
 import { Input, Avatar, Comment, Tooltip, Button } from 'antd';
-
+import { ICommentItem } from './ICommentItem';
 const { TextArea } = Input;
 
 dayjs.extend(relativeTime);
 
 const userName = 'Michael';
 
-const defaultData = [
+const defaultData: Array<ICommentItem> = [
   {
     id: 1,
     parentId: null,
-    level: 0,
     author: 'Michael',
     content: 'Parent Comment',
     datetime: '2022-09-22 10:56:00',
+    editing: false,
     children: [
       {
         id: 2,
         parentId: 1,
-        level: 1,
         author: 'Angela',
         content: 'single nested comment',
         datetime: '2022-09-22 11:56:00',
+        editing: false,
       },
       {
         id: 3,
         parentId: 1,
-        level: 1,
         author: 'Michael',
         content: 'second nested comment',
         datetime: '2022-09-22 11:56:00',
+        editing: false,
       },
     ],
   },
-  { id: 4, parentId: null, author: 'Bishop', content: 'test2', children: [] },
+  {
+    id: 4,
+    parentId: null,
+    author: 'Bishop',
+    content: 'test2',
+    datetime: '2022-09-22 11:56:00',
+    editing: false,
+  },
 ];
 
 export default function App() {
@@ -64,6 +71,25 @@ export default function App() {
     }
   };
 
+  const setCommentProperty = (comment: ICommentItem, expression: object) => {
+    setData((prevState: ICommentItem[]) =>
+      prevState.map((el: ICommentItem) =>
+        el.id === comment.id
+          ? Object.assign({}, el, expression)
+          : el.children
+          ? {
+              ...el,
+              children: el.children.map((child: ICommentItem) =>
+                child.id === comment.id
+                  ? Object.assign({}, child, expression)
+                  : child
+              ),
+            }
+          : el
+      )
+    );
+  };
+
   const setNodeValue = (nodes, action) => {
     for (const node of nodes) {
       action(node);
@@ -71,13 +97,13 @@ export default function App() {
     }
   };
 
-  const removeComment = (commentId, parentId) => {
+  const removeComment = (commentId: number, parentId: number) => {
     if (!parentId) {
       setData(data.filter((item) => item.id !== commentId));
       return;
     }
 
-    const newState = data.map((item) => {
+    const newState = data.map((item: ICommentItem) => {
       if (item.id == parentId) {
         console.log('parent', item.id);
         item.children = item.children.filter((child) => {
@@ -90,48 +116,45 @@ export default function App() {
     setData(newState);
   };
 
-  const handleEditClick = (item) => {
+  const handleEditClick = (item: ICommentItem) => {
     console.log('handleEditClick ', item);
-    setNodeValue(data, (item) => (item.editing = false));
+    setNodeValue(data, (item: ICommentItem) => (item.editing = false));
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = true;
     setData((prev) => [...data]);
   };
 
-  const handleReplyClick = (item) => {
+  const handleReplyClick = (item: ICommentItem) => {
     console.log('handleReplyClick ', item);
-    setNodeValue(data, (item) => (item.replying = false));
-    //let comment = findNode(data, ({ id }) => id === item.id);
-    //comment.replying = true;
-    setData((prev) => [...data]);
-    AddComment(item);
+    AddReply(item);
   };
 
-  const handleEditCancelClick = (item) => {
+  const handleEditCancelClick = (item: ICommentItem) => {
     console.log('handleEditCancelClick ', item);
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = false;
     if (comment.replying) {
       removeComment(item.id, item.parentId);
     }
-
     setData((prev) => [...data]);
   };
 
-  const handleDeleteClick = (item) => {
+  const handleDeleteClick = (item: ICommentItem) => {
     console.log('handleDeleteClick ', item);
-    setNodeValue(data, (item) => (item.deleting = true));
+    setCommentProperty(item, { deleting: true });
     timerRef.current = setTimeout(() => {
-      setNodeValue(data, (item) => (item.deleting = false));
+      setCommentProperty(item, { deleting: false });
 
       removeComment(item.id, item.parentId);
 
-      console.log('done');
+      console.log('handleDeleteClick done');
     }, 1000);
   };
 
-  const AddComment = (item: any) => {
+  const AddReply = (item: any) => {
     let comment = findNode(data, ({ id }) => id === item.id);
+
+    if (!comment.children) comment.children = [];
 
     var timeId = new Date().getTime();
 
@@ -150,20 +173,19 @@ export default function App() {
     console.log(data);
   };
 
-  const handleSubmit = (item, val) => {
+  const handleSubmit = (item: ICommentItem, val: string) => {
     console.log('submitting ', val);
 
     if (!val) return;
 
-    setSubmitting(true);
+    let comment = findNode(data, ({ id }) => id === item.id);
+    setCommentProperty(item, { submitting: true });
 
     timerRef.current = setTimeout(() => {
-      setSubmitting(false);
-      let comment = findNode(data, ({ id }) => id === item.id);
       comment.content = val;
       comment.datetime = dayjs().format();
-      setNodeValue(data, (item) => (item.editing = false));
-
+      setNodeValue(data, (item: ICommentItem) => (item.editing = false));
+      setCommentProperty(item, { submitting: false });
       setData((prev) => [...data]);
       console.log('done');
     }, 1000);
@@ -184,7 +206,6 @@ export default function App() {
               onDelete={handleDeleteClick}
               onEdit={handleEditClick}
               onCancelEdit={handleEditCancelClick}
-              submitting={submitting}
               onReply={handleReplyClick}
             />
           }
