@@ -101,8 +101,8 @@ export default function App() {
   const handleReplyClick = (item) => {
     console.log('handleReplyClick ', item);
     setNodeValue(data, (item) => (item.replying = false));
-    let comment = findNode(data, ({ id }) => id === item.id);
-    comment.replying = true;
+    //let comment = findNode(data, ({ id }) => id === item.id);
+    //comment.replying = true;
     setData((prev) => [...data]);
     AddComment(item);
   };
@@ -111,6 +111,10 @@ export default function App() {
     console.log('handleEditCancelClick ', item);
     let comment = findNode(data, ({ id }) => id === item.id);
     comment.editing = false;
+    if (comment.replying) {
+      removeComment(item.id, item.parentId);
+    }
+
     setData((prev) => [...data]);
   };
 
@@ -122,19 +126,22 @@ export default function App() {
 
       removeComment(item.id, item.parentId);
 
-      // setData((prev) => [...data]);
       console.log('done');
     }, 1000);
   };
 
   const AddComment = (item: any) => {
     let comment = findNode(data, ({ id }) => id === item.id);
+
+    var timeId = new Date().getTime();
+
     comment.children.push({
-      id: 15,
+      id: timeId,
       author: userName,
-      content: 'newly added Comment',
-      children: [],
+      content: '',
       parentId: item.id,
+      editing: true,
+      replying: true,
     });
 
     console.log(comment);

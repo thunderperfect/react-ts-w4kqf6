@@ -72,8 +72,9 @@ export default function Editor({
           style={{ marginBottom: 0 }}
         >
           <TextArea
-            placeholder="Add a comment"
+            placeholder="Add comments to ask for more information or suggest improvements"
             autoSize={false}
+            autoFocus
             onChange={handleOnChange}
             value={contentCopy}
             size="small"
@@ -84,8 +85,8 @@ export default function Editor({
         <React.Fragment>
           <div
             style={{
-              border: '1px solid #DCDCDC',
-              padding: '0px 0px 2px 5px',
+              //border: '1px solid #DCDCDC',
+              //padding: '0px 0px 2px 5px',
             }}
           >
             {contentCopy}
@@ -99,9 +100,9 @@ export default function Editor({
             onClick={handleReplyClick}
             type="link"
             size="small"
-            disabled={item.replying}
+            disabled={item.replying || item.editing}
           >
-            Reply
+            Add a comment
           </Button>
         </React.Fragment>
       )}
@@ -144,7 +145,11 @@ export default function Editor({
           <ButtonSpacer />
           <Popconfirm
             onConfirm={handleDeleteClick}
-            title="Are you sure you want to delete this Comment?"
+            title={
+              item.children
+                ? 'Are you sure you want to delete this comment thread?'
+                : 'Are you sure you want to delete this comment?'
+            }
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
             <Button loading={item.deleting} type="link" size="small">
