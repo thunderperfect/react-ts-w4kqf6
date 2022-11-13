@@ -1,8 +1,11 @@
 import * as React from 'react';
+import { Divider, Avatar, Comment, Tooltip, Button } from 'antd';
 import './style.css';
 
-import  CommentThread  from './CommentThread';
+import CommentThread from './CommentThread';
 import { CommentItem } from './CommentItem';
+import EditCategory from './EditCategory';
+
 const userName = 'Michael';
 
 const defaultData: Array<CommentItem> = [
@@ -46,7 +49,9 @@ export default function App() {
   return (
     <div style={{ padding: '20px' }}>
       <CommentThread userName={userName} defaultData={defaultData} />
-  
+      <Divider />
+
+      <EditCategory />
     </div>
   );
 }
