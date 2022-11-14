@@ -25,16 +25,25 @@ const sampleCase: Case = {
   logNumber: 'EE-1234-12345',
   categories: [
     { code: 'abc', description: 'test 1' },
-    { code: 'def', description: 'test 2' },
+    { code: 'jkl', description: 'test 2' },
   ],
 };
 
-export default function EditCategory() {
+const EditCategory = () => {
   const [form] = Form.useForm();
+
+  const [selectedCategories, setSelectedCategories] = React.useState();
+
+  React.useEffect(() => {
+    console.log('useEffect');
+    form.setFieldsValue(sampleCase);
+    setSelectedCategories(['abc','def'])
+
+  }, []);
 
   const mapCategoriesFromSelected = (values: any) => {
     let categories = allCategories.filter((cat) =>
-      form.getFieldValue('selectedCategoryCodes').some((c) => c === cat.code)
+      selectedCategories.some((c) => c === cat.code)
     );
 
     console.log(categories);
@@ -46,9 +55,8 @@ export default function EditCategory() {
     console.log(values);
   };
 
-  const modifiedForm = {
-    ...sampleCase,
-    selectedCategoryCodes: sampleCase.categories.map((cat) => cat.code),
+  const onChange = (e) => {
+    setSelectedCategories(e);
   };
 
   const options: SelectProps['options'] = allCategories.map(
@@ -64,16 +72,24 @@ export default function EditCategory() {
 
   return (
     <React.Fragment>
-      <Form form={form} initialValues={modifiedForm} onFinish={onFinish}>
+      <Form form={form} onFinish={onFinish}>
         <Form.Item name="categories" hidden />
         <Form.Item name="logNumber">
           <Input />
         </Form.Item>
-        <Form.Item name="selectedCategoryCodes">
-          <Select mode="multiple" options={options} />
-        </Form.Item>
+
+        <Select
+          style={{ width: '100%' }}
+          mode="multiple"
+          options={options}
+          value={selectedCategories}
+          onChange={onChange}
+        />
+        <br />
         <Button htmlType="submit">Save</Button>
       </Form>
     </React.Fragment>
   );
-}
+};
+
+export default EditCategory;
