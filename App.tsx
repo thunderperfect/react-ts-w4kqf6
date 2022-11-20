@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { Divider, Avatar, Comment, Tooltip, Button } from 'antd';
 import './style.css';
+import {
+  selectAllBreeds,
+  fetchBreeds,
+  refreshBreeds,
+} from './features/breeds/breedsSlice';
+import { useAppSelector, useAppDispatch } from './app/hooks';
 
 import CommentThread from './CommentThread';
 import { CommentItem } from './CommentItem';
@@ -46,11 +52,32 @@ const defaultData: Array<CommentItem> = [
 ];
 
 export default function App() {
+  const dispatch = useAppDispatch();
+  const breeds = useAppSelector(selectAllBreeds);
+
+  const postStatus = useAppSelector((state) => state.breeds.status);
+  // const error = useSelector((state) => state.posts.error)
+
+  React.useEffect(() => {
+    if (postStatus === 'idle') {
+      dispatch(fetchBreeds());
+      console.log('breeds=', breeds);
+    }
+  }, [postStatus, dispatch]);
+
   return (
     <div style={{ padding: '20px' }}>
       <CommentThread userName={userName} defaultData={defaultData} />
       <Divider />
-
+      <Button onClick={() => dispatch(refreshBreeds({ status: 'idle' }))}>
+        test
+      </Button>
+      {
+        //console.log('breeds.breeds', breeds.breeds)
+        breeds.data.map((b) => (
+          <div>{b}</div>
+        ))
+      }
       <EditCategory />
     </div>
   );
